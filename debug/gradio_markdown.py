@@ -12,11 +12,6 @@ from dotenv import load_dotenv
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-try:
-    from gradio.data_classes import VideoData
-except ImportError:  # pragma: no cover - gradio versions without data classes
-    VideoData = None
-
 import gradio as gr
 from openai import OpenAI
 from PIL import Image
@@ -54,14 +49,6 @@ def ensure_video_path(video_value: Optional[str | Dict[str, Any] | Any]) -> Opti
         return video_value
     if isinstance(video_value, dict):
         return video_value.get("name") or video_value.get("video") or video_value.get("path")
-    if VideoData is not None and isinstance(video_value, VideoData):
-        if getattr(video_value, "path", None):
-            return video_value.path
-        nested_video = getattr(video_value, "video", None)
-        if isinstance(nested_video, dict):
-            return nested_video.get("name") or nested_video.get("path")
-        if isinstance(nested_video, str):
-            return nested_video
     if hasattr(video_value, "path") and getattr(video_value, "path"):
         return getattr(video_value, "path")
     if hasattr(video_value, "name") and getattr(video_value, "name"):
